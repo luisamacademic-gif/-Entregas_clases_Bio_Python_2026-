@@ -172,6 +172,65 @@
             text-align: center;
             padding: 40px;
         }
+
+        /* ========== Introducción specific styles ========== */
+        .intro-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #1b1f2b;
+            padding: 60px 40px;
+            text-align: center;
+            border: 1px solid #2a2f40;
+        }
+
+        .intro-card .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c8cff, #4a6cf7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(108, 140, 255, 0.25);
+        }
+
+        .intro-card h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #e6e8ef;
+        }
+
+        .intro-card .subtitle {
+            font-size: 1.1rem;
+            color: #6c8cff;
+            margin-bottom: 16px;
+        }
+
+        .intro-card .description {
+            max-width: 500px;
+            color: #8b90a3;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .intro-card .badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(108, 140, 255, 0.12);
+            color: #6c8cff;
+            font-size: 0.85rem;
+            border: 1px solid rgba(108, 140, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -192,6 +251,7 @@
         // CONFIGURACIÓN
         // ============================================================
         const TOTAL_ENTREGAS = 17;
+        const CARPETA_PDFS = 'carpeta programación/';
 
         // ============================================================
         // ELEMENTOS DOM
@@ -203,6 +263,20 @@
         // CONSTRUIR PESTAÑAS
         // ============================================================
         function buildTabs() {
+            // Pestaña de Introducción
+            const introBtn = document.createElement('button');
+            introBtn.className = 'tab-btn';
+            introBtn.dataset.tab = 'intro';
+            introBtn.innerHTML = `<span class="tab-num">📖</span> Introducción`;
+            introBtn.addEventListener('click', () => activateTab('intro'));
+            tabsEl.appendChild(introBtn);
+
+            // Separador visual (opcional)
+            const separator = document.createElement('div');
+            separator.style.cssText = 'height: 1px; background: #262b3a; margin: 6px 10px;';
+            tabsEl.appendChild(separator);
+
+            // Pestañas de entregas
             for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn';
@@ -217,38 +291,51 @@
         // CONSTRUIR PANELES
         // ============================================================
         function buildPanels() {
+            // Panel de Introducción
+            const introPanel = document.createElement('section');
+            introPanel.className = 'panel';
+            introPanel.id = 'panel-intro';
+            introPanel.innerHTML = `
+                <div class="intro-card">
+                    <div class="avatar">LM</div>
+                    <h1>Luisa Fernanda Muñoz</h1>
+                    <div class="subtitle">Estudiante de Pregrado · Biología</div>
+                    <p class="description">
+                        Apasionada por la intersección entre la biología y la programación. 
+                        Este repositorio contiene mis entregas del curso Bio-Python, 
+                        donde combino mis conocimientos en ciencias biológicas con 
+                        herramientas computacionales para el análisis de datos.
+                    </p>
+                    <div class="badge">📚 Promoción 2026</div>
+                </div>
+            `;
+            contentEl.appendChild(introPanel);
+
+            // Paneles de entregas
             for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
                 const panel = document.createElement('section');
                 panel.className = 'panel';
                 panel.id = `panel-${i}`;
 
-                // --- Entrega 1: muestra el PDF (igual que en el ejemplo) ---
-                if (i === 1) {
-                    panel.innerHTML = `
-                        <div class="panel-header">
-                            <h2>Entrega 1</h2>
-                            <p>Visualización embebida: EntregaSemana3.pdf</p>
-                        </div>
-                        <div class="pdf-wrapper">
-                            <embed src="EntregaSemana3.pdf" type="application/pdf" />
-                        </div>
-                        <div class="pdf-fallback">
-                            Si el PDF no se visualiza correctamente, puedes
-                            <a href="EntregaSemana3.pdf" target="_blank" rel="noopener">
-                                abrirlo en una nueva pestaña
-                            </a>.
-                        </div>
-                    `;
-                } else {
-                    // --- Resto de entregas: placeholder ---
-                    panel.innerHTML = `
-                        <div class="panel-header">
-                            <h2>Entrega ${i}</h2>
-                            <p>Contenido pendiente por agregar</p>
-                        </div>
-                        <div class="empty-card">Aún no se ha añadido contenido para esta entrega.</div>
-                    `;
-                }
+                // Construir la ruta completa del PDF
+                const pdfPath = `${CARPETA_PDFS}Semana${i}.pdf`;
+                
+                // HTML del panel
+                panel.innerHTML = `
+                    <div class="panel-header">
+                        <h2>Entrega ${i}</h2>
+                        <p>Visualización embebida: ${pdfPath}</p>
+                    </div>
+                    <div class="pdf-wrapper">
+                        <embed src="${pdfPath}" type="application/pdf" />
+                    </div>
+                    <div class="pdf-fallback">
+                        Si el PDF no se visualiza correctamente, puedes
+                        <a href="${pdfPath}" target="_blank" rel="noopener">
+                            abrirlo en una nueva pestaña
+                        </a>.
+                    </div>
+                `;
 
                 contentEl.appendChild(panel);
             }
@@ -257,21 +344,25 @@
         // ============================================================
         // ACTIVAR PESTAÑA / PANEL
         // ============================================================
-        function activateTab(n) {
+        function activateTab(id) {
             // Actualizar pestañas
             document.querySelectorAll('.tab-btn').forEach((btn) => {
-                const isActive = Number(btn.dataset.tab) === n;
+                const isActive = btn.dataset.tab === String(id);
                 btn.classList.toggle('active', isActive);
             });
 
             // Actualizar paneles
             document.querySelectorAll('.panel').forEach((panel) => {
-                const isActive = panel.id === `panel-${n}`;
-                panel.classList.toggle('active', isActive);
+                const panelId = panel.id === `panel-${id}`;
+                panel.classList.toggle('active', panelId);
             });
 
             // Actualizar hash de la URL
-            window.location.hash = `entrega-${n}`;
+            if (id === 'intro') {
+                window.location.hash = 'introduccion';
+            } else {
+                window.location.hash = `entrega-${id}`;
+            }
         }
 
         // ============================================================
@@ -281,13 +372,21 @@
             buildTabs();
             buildPanels();
 
-            // Leer hash de la URL (ej: #entrega-3)
-            const hashMatch = window.location.hash.match(/entrega-(\d+)/);
-            let initial = 1;
-            if (hashMatch) {
-                const num = Number(hashMatch[1]);
-                if (num >= 1 && num <= TOTAL_ENTREGAS) {
-                    initial = num;
+            // Leer hash de la URL (ej: #entrega-3 o #introduccion)
+            const hash = window.location.hash;
+            let initial = 'intro';
+
+            if (hash) {
+                const introMatch = hash.match(/introduccion/);
+                const entregaMatch = hash.match(/entrega-(\d+)/);
+                
+                if (introMatch) {
+                    initial = 'intro';
+                } else if (entregaMatch) {
+                    const num = Number(entregaMatch[1]);
+                    if (num >= 1 && num <= TOTAL_ENTREGAS) {
+                        initial = num;
+                    }
                 }
             }
 
