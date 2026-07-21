@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entregas Programación - Bio-Python</title>
+    <style>
+        /* ========== Reset & base ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #0f1115;
+            color: #e6e8ef;
+        }
+
+        /* ========== Layout ========== */
+        .app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: #161923;
+            border-right: 1px solid #262b3a;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.05rem;
+            line-height: 1.35;
+            font-weight: 600;
+            color: #e6e8ef;
+            padding: 24px 20px 16px;
+            margin: 0;
+            border-bottom: 1px solid #262b3a;
+        }
+        .sidebar-title span {
+            color: #6c8cff;
+            font-weight: 700;
+        }
+
+        .tabs {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #8b90a3;
+            font-size: 0.92rem;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #e6e8ef;
+        }
+        .tab-btn.active {
+            background: rgba(108, 140, 255, 0.15);
+            color: #6c8cff;
+            font-weight: 600;
+        }
+
+        .tab-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .tab-btn.active .tab-num {
+            background: #6c8cff;
+            color: #0f1115;
+        }
+
+        /* ========== Content ========== */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 40px;
+        }
+
+        .panel {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+        .panel.active {
+            display: flex;
+        }
+
+        .panel-header {
+            margin-bottom: 20px;
+        }
+        .panel-header h2 {
+            margin: 0 0 6px;
+            font-size: 1.4rem;
+        }
+        .panel-header p {
+            margin: 0;
+            color: #8b90a3;
+            font-size: 0.9rem;
+        }
+
+        /* ========== PDF embed ========== */
+        .pdf-wrapper {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2f40;
+            background: #20232e;
+            min-height: 0;
+        }
+        .pdf-wrapper embed,
+        .pdf-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .pdf-fallback {
+            padding: 20px 0 0;
+            color: #8b90a3;
+            font-size: 0.9rem;
+        }
+        .pdf-fallback a {
+            color: #6c8cff;
+            text-decoration: none;
+        }
+        .pdf-fallback a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== Empty state ========== */
+        .empty-card {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #2a2f40;
+            border-radius: 12px;
+            background: #1b1f2b;
+            color: #8b90a3;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1 class="sidebar-title">Entregas Programación<br><span>Bio-Python</span></h1>
+            <nav class="tabs" id="tabs"></nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="content" id="content"></main>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURACIÓN
+        // ============================================================
+        const TOTAL_ENTREGAS = 17;
+
+        // ============================================================
+        // ELEMENTOS DOM
+        // ============================================================
+        const tabsEl = document.getElementById('tabs');
+        const contentEl = document.getElementById('content');
+
+        // ============================================================
+        // CONSTRUIR PESTAÑAS
+        // ============================================================
+        function buildTabs() {
+            for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn';
+                btn.dataset.tab = i;
+                btn.innerHTML = `<span class="tab-num">${i}</span> Entrega ${i}`;
+                btn.addEventListener('click', () => activateTab(i));
+                tabsEl.appendChild(btn);
+            }
+        }
+
+        // ============================================================
+        // CONSTRUIR PANELES
+        // ============================================================
+        function buildPanels() {
+            for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
+                const panel = document.createElement('section');
+                panel.className = 'panel';
+                panel.id = `panel-${i}`;
+
+                // --- Entrega 1: muestra el PDF (igual que en el ejemplo) ---
+                if (i === 1) {
+                    panel.innerHTML = `
+                        <div class="panel-header">
+                            <h2>Entrega 1</h2>
+                            <p>Visualización embebida: EntregaSemana3.pdf</p>
+                        </div>
+                        <div class="pdf-wrapper">
+                            <embed src="EntregaSemana3.pdf" type="application/pdf" />
+                        </div>
+                        <div class="pdf-fallback">
+                            Si el PDF no se visualiza correctamente, puedes
+                            <a href="EntregaSemana3.pdf" target="_blank" rel="noopener">
+                                abrirlo en una nueva pestaña
+                            </a>.
+                        </div>
+                    `;
+                } else {
+                    // --- Resto de entregas: placeholder ---
+                    panel.innerHTML = `
+                        <div class="panel-header">
+                            <h2>Entrega ${i}</h2>
+                            <p>Contenido pendiente por agregar</p>
+                        </div>
+                        <div class="empty-card">Aún no se ha añadido contenido para esta entrega.</div>
+                    `;
+                }
+
+                contentEl.appendChild(panel);
+            }
+        }
+
+        // ============================================================
+        // ACTIVAR PESTAÑA / PANEL
+        // ============================================================
+        function activateTab(n) {
+            // Actualizar pestañas
+            document.querySelectorAll('.tab-btn').forEach((btn) => {
+                const isActive = Number(btn.dataset.tab) === n;
+                btn.classList.toggle('active', isActive);
+            });
+
+            // Actualizar paneles
+            document.querySelectorAll('.panel').forEach((panel) => {
+                const isActive = panel.id === `panel-${n}`;
+                panel.classList.toggle('active', isActive);
+            });
+
+            // Actualizar hash de la URL
+            window.location.hash = `entrega-${n}`;
+        }
+
+        // ============================================================
+        // INICIALIZACIÓN
+        // ============================================================
+        function init() {
+            buildTabs();
+            buildPanels();
+
+            // Leer hash de la URL (ej: #entrega-3)
+            const hashMatch = window.location.hash.match(/entrega-(\d+)/);
+            let initial = 1;
+            if (hashMatch) {
+                const num = Number(hashMatch[1]);
+                if (num >= 1 && num <= TOTAL_ENTREGAS) {
+                    initial = num;
+                }
+            }
+
+            activateTab(initial);
+        }
+
+        // Arrancar
+        init();
+    </script>
+
+</body>
+</html>
