@@ -250,8 +250,8 @@
         // ============================================================
         // CONFIGURACIÓN
         // ============================================================
-        const TOTAL_ENTREGAS = 17;
-        const CARPETA_PDFS = 'carpeta programación/';
+        const TOTAL_ENTREGAS = 2; // Solo 2 entregas
+        const CARPETA_PDFS = 'Entregas_Semana_1/'; // Carpeta correcta
 
         // ============================================================
         // ELEMENTOS DOM
@@ -271,17 +271,17 @@
             introBtn.addEventListener('click', () => activateTab('intro'));
             tabsEl.appendChild(introBtn);
 
-            // Separador visual (opcional)
+            // Separador visual
             const separator = document.createElement('div');
             separator.style.cssText = 'height: 1px; background: #262b3a; margin: 6px 10px;';
             tabsEl.appendChild(separator);
 
-            // Pestañas de entregas
+            // Pestañas de entregas (solo 2)
             for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn';
                 btn.dataset.tab = i;
-                btn.innerHTML = `<span class="tab-num">${i}</span> Entrega ${i}`;
+                btn.innerHTML = `<span class="tab-num">${i}</span> Semana ${i}`;
                 btn.addEventListener('click', () => activateTab(i));
                 tabsEl.appendChild(btn);
             }
@@ -311,19 +311,18 @@
             `;
             contentEl.appendChild(introPanel);
 
-            // Paneles de entregas
+            // Paneles de entregas (solo 2)
             for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
                 const panel = document.createElement('section');
                 panel.className = 'panel';
                 panel.id = `panel-${i}`;
 
-                // Construir la ruta completa del PDF
+                // Ruta correcta: Entregas_Semana_1/Semana1.pdf y Semana2.pdf
                 const pdfPath = `${CARPETA_PDFS}Semana${i}.pdf`;
                 
-                // HTML del panel
                 panel.innerHTML = `
                     <div class="panel-header">
-                        <h2>Entrega ${i}</h2>
+                        <h2>Semana ${i}</h2>
                         <p>Visualización embebida: ${pdfPath}</p>
                     </div>
                     <div class="pdf-wrapper">
@@ -361,7 +360,7 @@
             if (id === 'intro') {
                 window.location.hash = 'introduccion';
             } else {
-                window.location.hash = `entrega-${id}`;
+                window.location.hash = `semana-${id}`;
             }
         }
 
@@ -372,13 +371,13 @@
             buildTabs();
             buildPanels();
 
-            // Leer hash de la URL (ej: #entrega-3 o #introduccion)
+            // Leer hash de la URL
             const hash = window.location.hash;
             let initial = 'intro';
 
             if (hash) {
                 const introMatch = hash.match(/introduccion/);
-                const entregaMatch = hash.match(/entrega-(\d+)/);
+                const entregaMatch = hash.match(/semana-(\d+)/);
                 
                 if (introMatch) {
                     initial = 'intro';
