@@ -1,400 +1,615 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Entregas Programación - Bio-Python</title>
-    <style>
-        /* ========== Reset & base ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entregas Programación - Bio-Python</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --sidebar-bg: #161923;
+  --sidebar-border: #262b3a;
+  --accent: #6c8cff;
+  --accent-soft: rgba(108, 140, 255, 0.15);
+  --text: #e6e8ef;
+  --text-dim: #8b90a3;
+  --card-bg: #1b1f2b;
+  --card-border: #2a2f40;
+}
+ 
+* {
+  box-sizing: border-box;
+}
+ 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+ 
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+ 
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+ 
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+ 
+.sidebar-title {
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--text);
+  padding: 24px 20px 16px;
+  margin: 0;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+ 
+.sidebar-title span {
+  color: var(--accent);
+  font-weight: 700;
+}
+ 
+.tabs {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 2px;
+}
+ 
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+ 
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+ 
+.tab-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+ 
+.tab-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+ 
+.tab-btn:disabled:hover {
+  background: transparent;
+  color: var(--text-dim);
+}
+ 
+.tab-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+ 
+.tab-btn.active .tab-num {
+  background: var(--accent);
+  color: #0f1115;
+}
+ 
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+}
+ 
+.panel {
+  display: none;
+  height: 100%;
+  flex-direction: column;
+}
+ 
+.panel.active {
+  display: flex;
+}
+ 
+.panel-header {
+  margin-bottom: 20px;
+}
+ 
+.panel-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+ 
+.panel-header p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+ 
+.pdf-wrapper {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  background: #20232e;
+  min-height: 0;
+}
+ 
+.pdf-wrapper embed,
+.pdf-wrapper iframe,
+.pdf-wrapper object {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+ 
+.pdf-fallback {
+  padding: 20px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+ 
+.pdf-fallback a {
+  color: var(--accent);
+}
+ 
+.empty-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 40px;
+}
 
-        html,
-        body {
-            height: 100%;
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: #0f1115;
-            color: #e6e8ef;
-        }
+/* Estilos para la portada */
+.cover {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(145deg, var(--card-bg), var(--bg));
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  padding: 50px 40px;
+}
 
-        /* ========== Layout ========== */
-        .app {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+.cover-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
 
-        /* ========== Sidebar ========== */
-        .sidebar {
-            width: 260px;
-            flex-shrink: 0;
-            background: #161923;
-            border-right: 1px solid #262b3a;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
+.cover-subtitle {
+  font-size: 1.6rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+  letter-spacing: 2px;
+}
 
-        .sidebar-title {
-            font-size: 1.05rem;
-            line-height: 1.35;
-            font-weight: 600;
-            color: #e6e8ef;
-            padding: 24px 20px 16px;
-            margin: 0;
-            border-bottom: 1px solid #262b3a;
-        }
-        .sidebar-title span {
-            color: #6c8cff;
-            font-weight: 700;
-        }
+.cover-divider {
+  width: 120px;
+  height: 3px;
+  background: var(--accent);
+  border: none;
+  margin: 0 auto 2.5rem;
+  border-radius: 4px;
+}
 
-        .tabs {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            gap: 2px;
-        }
+.cover-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem 3rem;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-        .tab-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border: none;
-            background: transparent;
-            color: #8b90a3;
-            font-size: 0.92rem;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.15s ease, color 0.15s ease;
-        }
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.04);
-            color: #e6e8ef;
-        }
-        .tab-btn.active {
-            background: rgba(108, 140, 255, 0.15);
-            color: #6c8cff;
-            font-weight: 600;
-        }
+.cover-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-        .tab-num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            font-size: 0.75rem;
-            flex-shrink: 0;
-        }
-        .tab-btn.active .tab-num {
-            background: #6c8cff;
-            color: #0f1115;
-        }
+.cover-info-item .label {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.2rem;
+}
 
-        /* ========== Content ========== */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px 40px;
-        }
+.cover-info-item .value {
+  color: var(--text);
+  font-weight: 500;
+}
 
-        .panel {
-            display: none;
-            height: 100%;
-            flex-direction: column;
-        }
-        .panel.active {
-            display: flex;
-        }
+.cover-info-full {
+  grid-column: 1 / -1;
+}
 
-        .panel-header {
-            margin-bottom: 20px;
-        }
-        .panel-header h2 {
-            margin: 0 0 6px;
-            font-size: 1.4rem;
-        }
-        .panel-header p {
-            margin: 0;
-            color: #8b90a3;
-            font-size: 0.9rem;
-        }
+.cover-footer {
+  margin-top: 3rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--card-border);
+  padding-top: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
 
-        /* ========== PDF embed ========== */
-        .pdf-wrapper {
-            flex: 1;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #2a2f40;
-            background: #20232e;
-            min-height: 0;
-        }
-        .pdf-wrapper embed,
-        .pdf-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
+.cover-footer .highlight {
+  color: var(--accent);
+}
 
-        .pdf-fallback {
-            padding: 20px 0 0;
-            color: #8b90a3;
-            font-size: 0.9rem;
-        }
-        .pdf-fallback a {
-            color: #6c8cff;
-            text-decoration: none;
-        }
-        .pdf-fallback a:hover {
-            text-decoration: underline;
-        }
+/* Estilos para lista de PDFs de la semana 6 */
+.pdf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+}
 
-        /* ========== Empty state ========== */
-        .empty-card {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px dashed #2a2f40;
-            border-radius: 12px;
-            background: #1b1f2b;
-            color: #8b90a3;
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 40px;
-        }
+.pdf-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  flex: 1;
+}
 
-        /* ========== Introducción specific styles ========== */
-        .intro-card {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: #1b1f2b;
-            padding: 60px 40px;
-            text-align: center;
-            border: 1px solid #2a2f40;
-        }
+.pdf-item-header {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--card-border);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-        .intro-card .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6c8cff, #4a6cf7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 32px rgba(108, 140, 255, 0.25);
-        }
+.pdf-item-header .file-name {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
 
-        .intro-card h1 {
-            font-size: 2rem;
-            margin-bottom: 8px;
-            color: #e6e8ef;
-        }
+.pdf-item-body {
+  flex: 1;
+  min-height: 200px;
+  background: #20232e;
+}
 
-        .intro-card .subtitle {
-            font-size: 1.1rem;
-            color: #6c8cff;
-            margin-bottom: 16px;
-        }
+.pdf-item-body embed,
+.pdf-item-body iframe,
+.pdf-item-body object {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  border: none;
+  display: block;
+}
 
-        .intro-card .description {
-            max-width: 500px;
-            color: #8b90a3;
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        .intro-card .badge {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: rgba(108, 140, 255, 0.12);
-            color: #6c8cff;
-            font-size: 0.85rem;
-            border: 1px solid rgba(108, 140, 255, 0.2);
-        }
-    </style>
+@media (max-width: 600px) {
+  .cover-title {
+    font-size: 2rem;
+  }
+  .cover-subtitle {
+    font-size: 1.2rem;
+  }
+  .cover-info {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .content {
+    padding: 16px;
+  }
+  .pdf-item-body embed,
+  .pdf-item-body iframe,
+  .pdf-item-body object {
+    min-height: 200px;
+  }
+}
+</style>
 </head>
 <body>
+  <div class="app">
+    <aside class="sidebar">
+      <h1 class="sidebar-title">Entregas Programación<br><span>Bio-Python</span></h1>
+      <nav class="tabs" id="tabs"></nav>
+    </aside>
+ 
+    <main class="content" id="content"></main>
+  </div>
+ 
+  <script>
+    const TOTAL_ENTREGAS = 17;
+    const tabsEl = document.getElementById("tabs");
+    const contentEl = document.getElementById("content");
+    const pdfName = (n) => `EntregaSemana_${n}.pdf`;
 
-    <div class="app">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h1 class="sidebar-title">Entregas Programación<br><span>Bio-Python</span></h1>
-            <nav class="tabs" id="tabs"></nav>
-        </aside>
+    // Archivos específicos para la Semana 6 (dentro de la carpeta EntregaSemana_6)
+    const semana6Files = [
+      "collab_6_agosto.pdf",
+      "collab_4_agosto.pdf",
+      "regiones_conocidas_y_sus_areas_4.pdf",
+      "regiones_conocidas_y_sus_areas_3.pdf",
+      "regiones_conocidas_y_sus_areas_2.pdf",
+      "regiones_conocidas_y_sus_areas_1.pdf"
+    ];
 
-        <!-- Main content -->
-        <main class="content" id="content"></main>
-    </div>
+    // --- PORTADA (fija como panel 0) ---
+    function createCoverPanel() {
+      const coverPanel = document.createElement("section");
+      coverPanel.className = "panel active";
+      coverPanel.id = "panel-0";
+      coverPanel.innerHTML = `
+        <div class="cover">
+          <h1 class="cover-title">🐍 Bio-Python</h1>
+          <h2 class="cover-subtitle">Entregas de Programación</h2>
+          <hr class="cover-divider">
+          <div class="cover-info">
+            <div class="cover-info-item">
+              <span class="label">Estudiante</span>
+              <span class="value">Luisa Fernanda Muñoz Calle</span>
+            </div>
+            <div class="cover-info-item">
+              <span class="label">Cédula</span>
+              <span class="value">1037663395</span>
+            </div>
+            <div class="cover-info-item cover-info-full">
+              <span class="label">Curso</span>
+              <span class="value">Programación 2026-2</span>
+            </div>
+            <div class="cover-info-item cover-info-full">
+              <span class="label">Programa</span>
+              <span class="value">Biología - Universidad CES</span>
+            </div>
+          </div>
+          <div class="cover-footer">
+            <span class="highlight">📄</span> Selecciona una semana en el menú lateral para ver su contenido
+          </div>
+        </div>
+      `;
+      contentEl.appendChild(coverPanel);
+    }
 
-    <script>
-        // ============================================================
-        // CONFIGURACIÓN
-        // ============================================================
-        const TOTAL_ENTREGAS = 2; // Solo 2 entregas
-        const CARPETA_PDFS = 'Entregas_Semana_1/'; // Carpeta correcta
+    function buildTabs() {
+      // Pestaña de portada (índice 0)
+      const coverBtn = document.createElement("button");
+      coverBtn.className = "tab-btn active";
+      coverBtn.dataset.tab = "0";
+      coverBtn.innerHTML = `<span class="tab-num">📋</span> Portada`;
+      coverBtn.addEventListener("click", () => activateTab(0));
+      tabsEl.appendChild(coverBtn);
 
-        // ============================================================
-        // ELEMENTOS DOM
-        // ============================================================
-        const tabsEl = document.getElementById('tabs');
-        const contentEl = document.getElementById('content');
+      // Pestañas de semanas 1 a 17
+      for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
+        const btn = document.createElement("button");
+        btn.className = "tab-btn";
+        btn.dataset.tab = i;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="tab-num">${i}</span> Semana ${i}`;
+        btn.addEventListener("click", () => activateTab(i));
+        tabsEl.appendChild(btn);
+      }
+    }
 
-        // ============================================================
-        // CONSTRUIR PESTAÑAS
-        // ============================================================
-        function buildTabs() {
-            // Pestaña de Introducción
-            const introBtn = document.createElement('button');
-            introBtn.className = 'tab-btn';
-            introBtn.dataset.tab = 'intro';
-            introBtn.innerHTML = `<span class="tab-num">📖</span> Introducción`;
-            introBtn.addEventListener('click', () => activateTab('intro'));
-            tabsEl.appendChild(introBtn);
-
-            // Separador visual
-            const separator = document.createElement('div');
-            separator.style.cssText = 'height: 1px; background: #262b3a; margin: 6px 10px;';
-            tabsEl.appendChild(separator);
-
-            // Pestañas de entregas (solo 2)
-            for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'tab-btn';
-                btn.dataset.tab = i;
-                btn.innerHTML = `<span class="tab-num">${i}</span> Semana ${i}`;
-                btn.addEventListener('click', () => activateTab(i));
-                tabsEl.appendChild(btn);
-            }
+    function buildPanels() {
+      // Panel de portada ya creado en createCoverPanel()
+      for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
+        const panel = document.createElement("section");
+        panel.className = "panel";
+        panel.id = `panel-${i}`;
+        // Para la semana 6, construimos un panel especial con lista de PDFs
+        if (i === 6) {
+          panel.innerHTML = `
+            <div class="panel-header">
+              <h2>Semana 6</h2>
+              <p>Archivos disponibles en la carpeta EntregaSemana_6</p>
+            </div>
+            <div class="pdf-list" id="semana6-list"></div>
+          `;
+        } else {
+          panel.innerHTML = `
+            <div class="panel-header">
+              <h2>Semana ${i}</h2>
+              <p>Contenido pendiente por agregar</p>
+            </div>
+            <div class="empty-card">Aún no se ha añadido el archivo "${pdfName(i)}" para esta semana.</div>
+          `;
         }
+        contentEl.appendChild(panel);
+      }
+    }
 
-        // ============================================================
-        // CONSTRUIR PANELES
-        // ============================================================
-        function buildPanels() {
-            // Panel de Introducción
-            const introPanel = document.createElement('section');
-            introPanel.className = 'panel';
-            introPanel.id = 'panel-intro';
-            introPanel.innerHTML = `
-                <div class="intro-card">
-                    <div class="avatar">LM</div>
-                    <h1>Luisa Fernanda Muñoz</h1>
-                    <div class="subtitle">Estudiante de Pregrado · Biología</div>
-                    <p class="description">
-                        Apasionada por la intersección entre la biología y la programación. 
-                        Este repositorio contiene mis entregas del curso Bio-Python, 
-                        donde combino mis conocimientos en ciencias biológicas con 
-                        herramientas computacionales para el análisis de datos.
-                    </p>
-                    <div class="badge">📚 Promoción 2026</div>
-                </div>
-            `;
-            contentEl.appendChild(introPanel);
+    function renderPdf(n) {
+      const name = pdfName(n);
+      const panel = document.getElementById(`panel-${n}`);
+      panel.innerHTML = `
+        <div class="panel-header">
+          <h2>Semana ${n}</h2>
+          <p>Visualización embebida: ${name}</p>
+        </div>
+        <div class="pdf-wrapper">
+          <embed src="${name}" type="application/pdf" />
+        </div>
+        <div class="pdf-fallback">
+          Si el PDF no se visualiza correctamente, puedes <a href="${name}" target="_blank" rel="noopener">abrirlo en una nueva pestaña</a>.
+        </div>
+      `;
+    }
 
-            // Paneles de entregas (solo 2)
-            for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
-                const panel = document.createElement('section');
-                panel.className = 'panel';
-                panel.id = `panel-${i}`;
+    // Renderiza la lista de PDFs para la semana 6
+    function renderSemana6(files) {
+      const listContainer = document.getElementById("semana6-list");
+      if (!listContainer) return;
 
-                // Ruta correcta: Entregas_Semana_1/Semana1.pdf y Semana2.pdf
-                const pdfPath = `${CARPETA_PDFS}Semana${i}.pdf`;
-                
-                panel.innerHTML = `
-                    <div class="panel-header">
-                        <h2>Semana ${i}</h2>
-                        <p>Visualización embebida: ${pdfPath}</p>
-                    </div>
-                    <div class="pdf-wrapper">
-                        <embed src="${pdfPath}" type="application/pdf" />
-                    </div>
-                    <div class="pdf-fallback">
-                        Si el PDF no se visualiza correctamente, puedes
-                        <a href="${pdfPath}" target="_blank" rel="noopener">
-                            abrirlo en una nueva pestaña
-                        </a>.
-                    </div>
-                `;
+      // Limpiamos el contenedor
+      listContainer.innerHTML = "";
 
-                contentEl.appendChild(panel);
-            }
+      files.forEach(fileName => {
+        const filePath = `EntregaSemana_6/${fileName}`;
+        const item = document.createElement("div");
+        item.className = "pdf-item";
+
+        item.innerHTML = `
+          <div class="pdf-item-header">
+            <span>📄 ${fileName}</span>
+            <span class="file-name">
+              <a href="${filePath}" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">Abrir en nueva pestaña</a>
+            </span>
+          </div>
+          <div class="pdf-item-body">
+            <embed src="${filePath}" type="application/pdf" />
+          </div>
+        `;
+
+        listContainer.appendChild(item);
+      });
+    }
+
+    function enableTab(n) {
+      const btn = tabsEl.querySelector(`.tab-btn[data-tab="${n}"]`);
+      if (btn) btn.disabled = false;
+    }
+
+    function fileExists(url) {
+      return new Promise((resolve) => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = url;
+        link.onload = () => { link.remove(); resolve(true); };
+        link.onerror = () => { link.remove(); resolve(false); };
+        document.head.appendChild(link);
+      });
+    }
+
+    // Verifica si existe al menos un PDF de la semana 6 en su carpeta
+    async function detectSemana6Files() {
+      const existingFiles = [];
+      for (const file of semana6Files) {
+        const path = `EntregaSemana_6/${file}`;
+        if (await fileExists(path)) {
+          existingFiles.push(file);
         }
+      }
+      return existingFiles;
+    }
 
-        // ============================================================
-        // ACTIVAR PESTAÑA / PANEL
-        // ============================================================
-        function activateTab(id) {
-            // Actualizar pestañas
-            document.querySelectorAll('.tab-btn').forEach((btn) => {
-                const isActive = btn.dataset.tab === String(id);
-                btn.classList.toggle('active', isActive);
-            });
+    async function detectPdfs() {
+      const found = [];
 
-            // Actualizar paneles
-            document.querySelectorAll('.panel').forEach((panel) => {
-                const panelId = panel.id === `panel-${id}`;
-                panel.classList.toggle('active', panelId);
-            });
-
-            // Actualizar hash de la URL
-            if (id === 'intro') {
-                window.location.hash = 'introduccion';
-            } else {
-                window.location.hash = `semana-${id}`;
+      // Detección normal para todas las semanas excepto la 6
+      await Promise.all(
+        Array.from({ length: TOTAL_ENTREGAS }, async (_, idx) => {
+          const n = idx + 1;
+          if (n === 6) {
+            // Para la semana 6, verificamos archivos en la carpeta
+            const semana6FilesFound = await detectSemana6Files();
+            if (semana6FilesFound.length > 0) {
+              renderSemana6(semana6FilesFound);
+              enableTab(6);
+              found.push(6);
             }
-        }
-
-        // ============================================================
-        // INICIALIZACIÓN
-        // ============================================================
-        function init() {
-            buildTabs();
-            buildPanels();
-
-            // Leer hash de la URL
-            const hash = window.location.hash;
-            let initial = 'intro';
-
-            if (hash) {
-                const introMatch = hash.match(/introduccion/);
-                const entregaMatch = hash.match(/semana-(\d+)/);
-                
-                if (introMatch) {
-                    initial = 'intro';
-                } else if (entregaMatch) {
-                    const num = Number(entregaMatch[1]);
-                    if (num >= 1 && num <= TOTAL_ENTREGAS) {
-                        initial = num;
-                    }
-                }
+          } else {
+            if (await fileExists(pdfName(n))) {
+              renderPdf(n);
+              enableTab(n);
+              found.push(n);
             }
+          }
+        })
+      );
+      return found.sort((a, b) => a - b);
+    }
 
-            activateTab(initial);
-        }
+    function activateTab(n) {
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        const isActive = Number(btn.dataset.tab) === n;
+        btn.classList.toggle("active", isActive);
+      });
+      document.querySelectorAll(".panel").forEach((panel) => {
+        const panelId = Number(panel.id.replace("panel-", ""));
+        panel.classList.toggle("active", panelId === n);
+      });
+      if (n === 0) {
+        window.location.hash = "portada";
+      } else {
+        window.location.hash = `semana-${n}`;
+      }
+    }
 
-        // Arrancar
-        init();
-    </script>
+    async function init() {
+      // Crear portada primero
+      createCoverPanel();
 
+      // Construir pestañas (incluye la de portada) y paneles
+      buildTabs();
+      buildPanels();
+
+      const found = await detectPdfs();
+
+      const hashMatch = window.location.hash.match(/semana-(\d+)/);
+      const fromHash = hashMatch ? Number(hashMatch[1]) : 0;
+
+      // Si el hash es "portada" o no coincide con ninguna semana, mostrar portada
+      if (window.location.hash === "#portada" || !found.includes(fromHash)) {
+        activateTab(0);
+      } else if (found.includes(fromHash)) {
+        activateTab(fromHash);
+      } else {
+        // Si no hay PDFs, mostrar portada por defecto
+        activateTab(0);
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
