@@ -282,59 +282,6 @@ body {
   color: var(--accent);
 }
 
-/* Estilos para lista de PDFs de la semana 6 */
-.pdf-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  flex: 1;
-  min-height: 0;
-}
-
-.pdf-item {
-  display: flex;
-  flex-direction: column;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  overflow: hidden;
-  flex: 1;
-}
-
-.pdf-item-header {
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid var(--card-border);
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--text);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.pdf-item-header .file-name {
-  color: var(--text-dim);
-  font-weight: 400;
-  font-size: 0.8rem;
-}
-
-.pdf-item-body {
-  flex: 1;
-  min-height: 200px;
-  background: #20232e;
-}
-
-.pdf-item-body embed,
-.pdf-item-body iframe,
-.pdf-item-body object {
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-  border: none;
-  display: block;
-}
-
 @media (max-width: 600px) {
   .cover-title {
     font-size: 2rem;
@@ -348,11 +295,6 @@ body {
   }
   .content {
     padding: 16px;
-  }
-  .pdf-item-body embed,
-  .pdf-item-body iframe,
-  .pdf-item-body object {
-    min-height: 200px;
   }
 }
 </style>
@@ -372,16 +314,6 @@ body {
     const tabsEl = document.getElementById("tabs");
     const contentEl = document.getElementById("content");
     const pdfName = (n) => `EntregaSemana_${n}.pdf`;
-
-    // Archivos específicos para la Semana 6 (dentro de la carpeta EntregaSemana_6)
-    const semana6Files = [
-      "collab_6_agosto.pdf",
-      "collab_4_agosto.pdf",
-      "regiones_conocidas_y_sus_areas_4.pdf",
-      "regiones_conocidas_y_sus_areas_3.pdf",
-      "regiones_conocidas_y_sus_areas_2.pdf",
-      "regiones_conocidas_y_sus_areas_1.pdf"
-    ];
 
     // --- PORTADA (fija como panel 0) ---
     function createCoverPanel() {
@@ -446,24 +378,13 @@ body {
         const panel = document.createElement("section");
         panel.className = "panel";
         panel.id = `panel-${i}`;
-        // Para la semana 6, construimos un panel especial con lista de PDFs
-        if (i === 6) {
-          panel.innerHTML = `
-            <div class="panel-header">
-              <h2>Semana 6</h2>
-              <p>Archivos disponibles en la carpeta EntregaSemana_6</p>
-            </div>
-            <div class="pdf-list" id="semana6-list"></div>
-          `;
-        } else {
-          panel.innerHTML = `
-            <div class="panel-header">
-              <h2>Semana ${i}</h2>
-              <p>Contenido pendiente por agregar</p>
-            </div>
-            <div class="empty-card">Aún no se ha añadido el archivo "${pdfName(i)}" para esta semana.</div>
-          `;
-        }
+        panel.innerHTML = `
+          <div class="panel-header">
+            <h2>Semana ${i}</h2>
+            <p>Contenido pendiente por agregar</p>
+          </div>
+          <div class="empty-card">Aún no se ha añadido el archivo "${pdfName(i)}" para esta semana.</div>
+        `;
         contentEl.appendChild(panel);
       }
     }
@@ -485,35 +406,6 @@ body {
       `;
     }
 
-    // Renderiza la lista de PDFs para la semana 6
-    function renderSemana6(files) {
-      const listContainer = document.getElementById("semana6-list");
-      if (!listContainer) return;
-
-      // Limpiamos el contenedor
-      listContainer.innerHTML = "";
-
-      files.forEach(fileName => {
-        const filePath = `EntregaSemana_6/${fileName}`;
-        const item = document.createElement("div");
-        item.className = "pdf-item";
-
-        item.innerHTML = `
-          <div class="pdf-item-header">
-            <span>📄 ${fileName}</span>
-            <span class="file-name">
-              <a href="${filePath}" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">Abrir en nueva pestaña</a>
-            </span>
-          </div>
-          <div class="pdf-item-body">
-            <embed src="${filePath}" type="application/pdf" />
-          </div>
-        `;
-
-        listContainer.appendChild(item);
-      });
-    }
-
     function enableTab(n) {
       const btn = tabsEl.querySelector(`.tab-btn[data-tab="${n}"]`);
       if (btn) btn.disabled = false;
@@ -530,39 +422,15 @@ body {
       });
     }
 
-    // Verifica si existe al menos un PDF de la semana 6 en su carpeta
-    async function detectSemana6Files() {
-      const existingFiles = [];
-      for (const file of semana6Files) {
-        const path = `EntregaSemana_6/${file}`;
-        if (await fileExists(path)) {
-          existingFiles.push(file);
-        }
-      }
-      return existingFiles;
-    }
-
     async function detectPdfs() {
       const found = [];
-
-      // Detección normal para todas las semanas excepto la 6
       await Promise.all(
         Array.from({ length: TOTAL_ENTREGAS }, async (_, idx) => {
           const n = idx + 1;
-          if (n === 6) {
-            // Para la semana 6, verificamos archivos en la carpeta
-            const semana6FilesFound = await detectSemana6Files();
-            if (semana6FilesFound.length > 0) {
-              renderSemana6(semana6FilesFound);
-              enableTab(6);
-              found.push(6);
-            }
-          } else {
-            if (await fileExists(pdfName(n))) {
-              renderPdf(n);
-              enableTab(n);
-              found.push(n);
-            }
+          if (await fileExists(pdfName(n))) {
+            renderPdf(n);
+            enableTab(n);
+            found.push(n);
           }
         })
       );
